@@ -8,24 +8,23 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.Bestiario">
-
         <activity
             android:name=".MainActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
         <activity
             android:name=".DetalleActivity"
             android:exported="false" />
-
         <activity
             android:name=".FavoritosActivity"
             android:exported="false" />
-
+        <activity android:name=".AvistamientoActivity"
+            android:exported="false" />
     </application>
 
 </manifest>

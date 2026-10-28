@@ -25,4 +25,10 @@
         android:layout_marginTop="16dp"
         android:text="Ver mis favoritos" />
 
+    <Button
+        android:id="@+id/btnDiario"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Diario de avistamientos" />
+
 </LinearLayout>

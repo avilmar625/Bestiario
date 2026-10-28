@@ -24,5 +24,8 @@ class MainActivity : ComponentActivity() {
         findViewById<Button>(R.id.botonFavoritos).setOnClickListener {
             startActivity(Intent(this, FavoritosActivity::class.java))
         }
+        findViewById<Button>(R.id.btnDiario).setOnClickListener {
+            startActivity(Intent(this, AvistamientoActivity::class.java))
+        }
     }
 }
