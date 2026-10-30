@@ -10,5 +10,6 @@ data class Avistamiento(
     val lugar: String,
     val fecha: Long,
     val latitud: Double? = null,
-    val longitud: Double? = null
+    val longitud: Double? = null,
+    val fotoPath: String? = null
 )

@@ -26,7 +26,9 @@ class MonstruoAdapter(
     override fun onBindViewHolder(holder: MonstruoViewHolder, position: Int) {
         val monstruo = monstruos[position]
         holder.nombre.text = monstruo.nombre
-        holder.imagen.setImageResource(monstruo.imagenRes)
+        val bitmap = Fotos.cargar(monstruo.fotoPath)
+        if (bitmap != null) holder.imagen.setImageBitmap(bitmap)
+        else holder.imagen.setImageResource(monstruo.imagenRes)
 
         holder.itemView.setOnClickListener {
             onClickMonstruo(monstruo)

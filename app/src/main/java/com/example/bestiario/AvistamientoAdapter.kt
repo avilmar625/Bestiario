@@ -3,6 +3,7 @@ package com.example.bestiario
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import java.text.SimpleDateFormat
@@ -18,6 +19,8 @@ class AvistamientoAdapter(
         val tvMonstruo: TextView = vista.findViewById(R.id.tvMonstruoFila)
         val tvLugar: TextView = vista.findViewById(R.id.tvLugarFila)
         val tvFecha: TextView = vista.findViewById(R.id.tvFechaFila)
+
+        val ivFoto: ImageView = vista.findViewById(R.id.ivFotoFila)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -41,6 +44,13 @@ class AvistamientoAdapter(
         holder.tvMonstruo.text = a.monstruo
         holder.tvLugar.text = "Visto en: " + a.lugar + coordenadas
         holder.tvFecha.text = formato.format(Date(a.fecha))
+        val bitmap = Fotos.cargar(a.fotoPath)
+        if (bitmap != null) {
+            holder.ivFoto.setImageBitmap(bitmap)
+            holder.ivFoto.visibility = View.VISIBLE
+        } else {
+            holder.ivFoto.visibility = View.GONE
+        }
         holder.itemView.setOnLongClickListener {
             onBorrar(a)
             true

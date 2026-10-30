@@ -20,6 +20,7 @@ import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.Priority
 import kotlinx.coroutines.launch
+import java.io.File
 
 class DetalleActivity : ComponentActivity() {
 
@@ -31,6 +32,9 @@ class DetalleActivity : ComponentActivity() {
     private var latitud: Double? = null
     private var longitud: Double? = null
 
+    private var fotoPath: String? = null
+    private var archivoFotoActual: File? = null
+
     // Cámara
     private val pedirPermisoCamara = registerForActivityResult(
         ActivityResultContracts.RequestPermission()
@@ -40,9 +44,15 @@ class DetalleActivity : ComponentActivity() {
     }
 
     private val hacerFoto = registerForActivityResult(
-        ActivityResultContracts.TakePicturePreview()
-    ) { miniatura: Bitmap? ->
-        if (miniatura != null) ivFoto.setImageBitmap(miniatura)
+        ActivityResultContracts.TakePicture()
+    ) { exito: Boolean ->
+        val archivo = archivoFotoActual
+        if (exito && archivo != null) {
+            fotoPath = archivo.absolutePath
+            ivFoto.setImageBitmap(Fotos.cargar(fotoPath))
+        } else {
+            archivo?.delete()
+        }
     }
 
     // Ubicación
@@ -82,7 +92,9 @@ class DetalleActivity : ComponentActivity() {
     }
 
     private fun lanzarCamara() {
-        hacerFoto.launch(null)
+        val archivo = Fotos.crearArchivo(this)
+        archivoFotoActual = archivo
+        hacerFoto.launch(Fotos.uriDe(this, archivo))
     }
 
     private fun tienePermisoUbicacion(): Boolean {
@@ -122,7 +134,12 @@ class DetalleActivity : ComponentActivity() {
     }
 
     private fun mostrar(monstruo: Monstruo) {
-        findViewById<ImageView>(R.id.imagenDetalle).setImageResource(monstruo.imagenRes)
+        val bitmapMonstruo = Fotos.cargar(monstruo.fotoPath)
+        val imagenDetalle = findViewById<ImageView>(R.id.imagenDetalle)
+        if (bitmapMonstruo != null) imagenDetalle.setImageBitmap(bitmapMonstruo)
+        else imagenDetalle.setImageResource(monstruo.imagenRes)
+
+        //findViewById<ImageView>(R.id.imagenDetalle).setImageResource(monstruo.imagenRes)
         findViewById<TextView>(R.id.nombreDetalle).text = monstruo.nombre
         findViewById<TextView>(R.id.descripcionDetalle).text = monstruo.descripcion
 
@@ -143,11 +160,18 @@ class DetalleActivity : ComponentActivity() {
                             lugar = lugar,
                             fecha = System.currentTimeMillis(),
                             latitud = latitud,
-                            longitud = longitud
+                            longitud = longitud,
+                            fotoPath = fotoPath
                         )
                     )
                     Toast.makeText(this@DetalleActivity, "Avistamiento guardado", Toast.LENGTH_SHORT).show()
                     etLugar.text.clear()
+                    // limpiamos para que el siguiente avistamiento no reutilice esta foto ni esta ubicación
+                    fotoPath = null
+                    latitud = null
+                    longitud = null
+                    ivFoto.setImageDrawable(null)
+                    tvUbicacion.text = "Ubicación: sin obtener"
                 }
             }
         }

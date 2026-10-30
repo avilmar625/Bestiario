@@ -7,5 +7,6 @@ import androidx.room.PrimaryKey
 data class MonstruoUsuario(
     @PrimaryKey(autoGenerate = true) val id: Int = 0,
     val nombre: String,
-    val descripcion: String
+    val descripcion: String,
+    val fotoPath: String? = null
 )
