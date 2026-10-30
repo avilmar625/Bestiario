@@ -31,4 +31,10 @@
         android:layout_height="wrap_content"
         android:text="Diario de avistamientos" />
 
+    <Button
+        android:id="@+id/btnCrearMonstruo"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Crear monstruo" />
+
 </LinearLayout>

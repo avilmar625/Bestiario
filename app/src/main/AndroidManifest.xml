@@ -23,8 +23,13 @@
         <activity
             android:name=".FavoritosActivity"
             android:exported="false" />
-        <activity android:name=".AvistamientoActivity"
+        <activity
+            android:name=".AvistamientoActivity"
             android:exported="false" />
+        <activity
+            android:name=".CrearMonstruoActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
     </application>
 
 </manifest>

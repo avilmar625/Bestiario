@@ -4,12 +4,14 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import com.example.bestiario.Avistamiento
 import com.example.bestiario.AvistamientoDao
+import com.example.bestiario.MonstruoUsuario
+import com.example.bestiario.MonstruoUsuarioDao
 
-@Database(entities = [Avistamiento::class], version = 1)
+@Database(entities = [Avistamiento::class, MonstruoUsuario::class], version = 2)
 abstract class AppDatabase : RoomDatabase() {
 
     abstract fun avistamientoDao(): AvistamientoDao
-
+    abstract fun monstruoUsuarioDao(): MonstruoUsuarioDao
     companion object {
         @Volatile
         private var instancia: AppDatabase? = null
@@ -20,7 +22,8 @@ abstract class AppDatabase : RoomDatabase() {
                     context.applicationContext,
                     AppDatabase::class.java,
                     "bestiario_db"
-                ).build()
+                ).fallbackToDestructiveMigration(true)
+                    .build()
                 instancia = nueva
                 nueva
             }

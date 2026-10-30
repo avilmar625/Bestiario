@@ -20,8 +20,15 @@ class DetalleActivity : ComponentActivity() {
         setContentView(R.layout.activity_detalle)
 
         val index = intent.getIntExtra("MONSTRUO_INDEX", 0)
-        val monstruo = MonstruosData.lista[index]
+        lifecycleScope.launch {
+            val monstruo = Catalogo.todos(this@DetalleActivity)[index]
+            mostrar(monstruo)
+        }
 
+        findViewById<Button>(R.id.botonVolverDetalle).setOnClickListener { finish() }
+    }
+
+    private fun mostrar(monstruo: Monstruo) {
         findViewById<ImageView>(R.id.imagenDetalle).setImageResource(monstruo.imagenRes)
         findViewById<TextView>(R.id.nombreDetalle).text = monstruo.nombre
         findViewById<TextView>(R.id.descripcionDetalle).text = monstruo.descripcion
@@ -29,12 +36,9 @@ class DetalleActivity : ComponentActivity() {
         reproductor = MediaPlayer.create(this, monstruo.sonidoRes)
         reproductor?.start()
 
-        // Registrar avistamiento (Room)
         val etLugar = findViewById<EditText>(R.id.etLugar)
-        val btnRegistrar = findViewById<Button>(R.id.btnRegistrar)
         val dao = AppDatabase.obtener(this).avistamientoDao()
-
-        btnRegistrar.setOnClickListener {
+        findViewById<Button>(R.id.btnRegistrar).setOnClickListener {
             val lugar = etLugar.text.toString().trim()
             if (lugar.isEmpty()) {
                 Toast.makeText(this, "Escribe dónde lo has visto", Toast.LENGTH_SHORT).show()
@@ -53,7 +57,6 @@ class DetalleActivity : ComponentActivity() {
             }
         }
 
-        // Favoritos (SharedPreferences)
         val prefs = getSharedPreferences("MisDatos", MODE_PRIVATE)
         val botonFavorito = findViewById<Button>(R.id.botonFavorito)
 
@@ -66,16 +69,11 @@ class DetalleActivity : ComponentActivity() {
 
         botonFavorito.setOnClickListener {
             val favoritos = (prefs.getStringSet("FAVORITOS", setOf()) ?: setOf()).toMutableSet()
-            if (favoritos.contains(monstruo.nombre)) {
-                favoritos.remove(monstruo.nombre)
-            } else {
-                favoritos.add(monstruo.nombre)
-            }
+            if (favoritos.contains(monstruo.nombre)) favoritos.remove(monstruo.nombre)
+            else favoritos.add(monstruo.nombre)
             prefs.edit().putStringSet("FAVORITOS", favoritos).apply()
             actualizarTextoBoton()
         }
-
-        findViewById<Button>(R.id.botonVolverDetalle).setOnClickListener { finish() }
     }
 
     override fun onDestroy() {
