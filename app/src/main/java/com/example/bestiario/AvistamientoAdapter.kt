@@ -29,8 +29,17 @@ class AvistamientoAdapter(
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val a = lista[position]
         val formato = SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault())
+
+        val lat = a.latitud
+        val lon = a.longitud
+        val coordenadas = if (lat != null && lon != null) {
+            "  (" + "%.4f".format(lat) + ", " + "%.4f".format(lon) + ")"
+        } else {
+            ""
+        }
+
         holder.tvMonstruo.text = a.monstruo
-        holder.tvLugar.text = "Visto en: " + a.lugar
+        holder.tvLugar.text = "Visto en: " + a.lugar + coordenadas
         holder.tvFecha.text = formato.format(Date(a.fecha))
         holder.itemView.setOnLongClickListener {
             onBorrar(a)

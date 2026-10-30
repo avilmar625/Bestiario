@@ -8,5 +8,7 @@ data class Avistamiento(
     @PrimaryKey(autoGenerate = true) val id: Int = 0,
     val monstruo: String,
     val lugar: String,
-    val fecha: Long
+    val fecha: Long,
+    val latitud: Double? = null,
+    val longitud: Double? = null
 )

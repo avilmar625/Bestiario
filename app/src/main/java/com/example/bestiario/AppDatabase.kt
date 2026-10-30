@@ -7,7 +7,7 @@ import com.example.bestiario.AvistamientoDao
 import com.example.bestiario.MonstruoUsuario
 import com.example.bestiario.MonstruoUsuarioDao
 
-@Database(entities = [Avistamiento::class, MonstruoUsuario::class], version = 2)
+@Database(entities = [Avistamiento::class, MonstruoUsuario::class], version = 3)
 abstract class AppDatabase : RoomDatabase() {
 
     abstract fun avistamientoDao(): AvistamientoDao
