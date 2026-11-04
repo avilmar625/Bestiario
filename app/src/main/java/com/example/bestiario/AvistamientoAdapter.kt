@@ -1,5 +1,6 @@
 package com.example.bestiario
 
+import android.app.AlertDialog
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -19,7 +20,6 @@ class AvistamientoAdapter(
         val tvMonstruo: TextView = vista.findViewById(R.id.tvMonstruoFila)
         val tvLugar: TextView = vista.findViewById(R.id.tvLugarFila)
         val tvFecha: TextView = vista.findViewById(R.id.tvFechaFila)
-
         val ivFoto: ImageView = vista.findViewById(R.id.ivFotoFila)
     }
 
@@ -30,32 +30,43 @@ class AvistamientoAdapter(
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val a = lista[position]
-        val formato = SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault())
+        val avistamiento = lista[position]
+        val latitud = avistamiento.latitud
+        val longitud = avistamiento.longitud
 
-        val lat = a.latitud
-        val lon = a.longitud
-        val coordenadas = if (lat != null && lon != null) {
-            "  (" + "%.4f".format(lat) + ", " + "%.4f".format(lon) + ")"
+        val coordenadas = if (latitud != null && longitud != null) {
+            "  (%.4f, %.4f)".format(Locale.US, latitud, longitud)
         } else {
             ""
         }
 
-        holder.tvMonstruo.text = a.monstruo
-        holder.tvLugar.text = "Visto en: " + a.lugar + coordenadas
-        holder.tvFecha.text = formato.format(Date(a.fecha))
-        val bitmap = Fotos.cargar(a.fotoPath)
+        holder.tvMonstruo.text = avistamiento.monstruo
+        holder.tvLugar.text = "Visto en: ${avistamiento.lugar}$coordenadas"
+        holder.tvFecha.text = formatoFecha.format(Date(avistamiento.fecha))
+
+        val bitmap = Fotos.cargar(avistamiento.fotoPath)
         if (bitmap != null) {
             holder.ivFoto.setImageBitmap(bitmap)
             holder.ivFoto.visibility = View.VISIBLE
         } else {
+            holder.ivFoto.setImageDrawable(null)
             holder.ivFoto.visibility = View.GONE
         }
+
         holder.itemView.setOnLongClickListener {
-            onBorrar(a)
+            AlertDialog.Builder(holder.itemView.context)
+                .setTitle("Borrar avistamiento")
+                .setMessage("¿Quieres eliminar este registro?")
+                .setNegativeButton("Cancelar", null)
+                .setPositiveButton("Borrar") { _, _ -> onBorrar(avistamiento) }
+                .show()
             true
         }
     }
 
     override fun getItemCount(): Int = lista.size
+
+    private companion object {
+        val formatoFecha = SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault())
+    }
 }
