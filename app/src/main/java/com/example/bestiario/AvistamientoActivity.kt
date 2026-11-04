@@ -1,7 +1,5 @@
 package com.example.bestiario
 
-
-import AppDatabase
 import android.os.Bundle
 import android.widget.Button
 import android.widget.TextView
