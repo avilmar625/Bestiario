@@ -5,5 +5,6 @@ data class Monstruo(
     val descripcion: String,
     val imagenRes: Int,
     val sonidoRes: Int?,
-    val fotoPath: String? = null
+    val fotoPath: String? = null,
+    val idUsuario: Int? = null
 )
