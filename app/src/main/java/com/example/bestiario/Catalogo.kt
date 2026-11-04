@@ -5,6 +5,7 @@ import android.content.Context
 object Catalogo {
 
     suspend fun todos(context: Context): List<Monstruo> {
+        //COMENTARIO
         val base = MonstruosData.lista
         val propios = AppDatabase.obtener(context).monstruoUsuarioDao().obtenerTodos()
             .map {

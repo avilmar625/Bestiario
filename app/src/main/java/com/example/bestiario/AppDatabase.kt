@@ -12,6 +12,8 @@ abstract class AppDatabase : RoomDatabase() {
 
     abstract fun avistamientoDao(): AvistamientoDao
     abstract fun monstruoUsuarioDao(): MonstruoUsuarioDao
+
+
     companion object {
         @Volatile
         private var instancia: AppDatabase? = null
