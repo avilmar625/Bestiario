@@ -1,84 +1,34 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent">
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:gravity="center_horizontal"
-        android:padding="24dp">
-
-        <ImageView
-            android:id="@+id/imagenDetalle"
-            android:layout_width="140dp"
-            android:layout_height="140dp"
-            android:layout_marginBottom="20dp" />
-
-        <TextView
-            android:id="@+id/nombreDetalle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="12dp"
-            android:textSize="24sp" />
-
-        <TextView
-            android:id="@+id/descripcionDetalle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="24dp"
-            android:gravity="center" />
-
-        <Button
-            android:id="@+id/botonFavorito"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="12dp" />
-
-        <Button
-            android:id="@+id/botonVolverDetalle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Volver" />
-
-        <EditText
-            android:id="@+id/etLugar"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:hint="¿Dónde lo has visto?" />
-
-        <Button
-            android:id="@+id/btnRegistrar"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Registrar avistamiento" />
-
-        <Button
-            android:id="@+id/btnFoto"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+    android:layout_width="match_parent" android:layout_height="match_parent" android:background="@color/fondo">
+    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:orientation="vertical" android:gravity="center_horizontal" android:padding="22dp">
+        <ImageView android:id="@+id/imagenDetalle" android:layout_width="190dp" android:layout_height="190dp"
+            android:layout_marginBottom="18dp" android:scaleType="centerCrop" />
+        <TextView android:id="@+id/nombreDetalle" android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:gravity="center" android:textColor="@color/texto_principal" android:textSize="28sp" android:textStyle="bold" />
+        <TextView android:id="@+id/descripcionDetalle" android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:layout_marginTop="10dp" android:layout_marginBottom="18dp" android:gravity="center"
+            android:textColor="@color/texto_secundario" android:textSize="16sp" />
+        <Button android:id="@+id/botonFavorito" android:layout_width="match_parent" android:layout_height="wrap_content" />
+        <Button android:id="@+id/btnEditarCriatura" android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:text="Editar mi criatura" android:visibility="gone" />
+        <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:layout_marginTop="20dp" android:text="REGISTRAR UN ENCUENTRO"
+            android:textColor="@color/acento" android:textStyle="bold" android:textSize="12sp" />
+        <EditText android:id="@+id/etLugar" android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:layout_marginTop="8dp" android:hint="¿Dónde lo has visto?" />
+        <Button android:id="@+id/btnFoto" android:layout_width="match_parent" android:layout_height="wrap_content"
             android:text="Hacer foto del avistamiento" />
-
-        <ImageView
-            android:id="@+id/ivFoto"
-            android:layout_width="match_parent"
-            android:layout_height="200dp"
-            android:layout_marginTop="8dp"
-            android:scaleType="centerInside" />
-
-        <Button
-            android:id="@+id/btnUbicacion"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+        <ImageView android:id="@+id/ivFoto" android:layout_width="match_parent" android:layout_height="180dp"
+            android:layout_marginTop="8dp" android:scaleType="centerInside" />
+        <Button android:id="@+id/btnUbicacion" android:layout_width="match_parent" android:layout_height="wrap_content"
             android:text="Obtener mi ubicación" />
-
-        <TextView
-            android:id="@+id/tvUbicacion"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Ubicación: sin obtener" />
-
+        <TextView android:id="@+id/tvUbicacion" android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:text="Ubicación: sin obtener" android:textColor="@color/texto_secundario" />
+        <Button android:id="@+id/btnRegistrar" android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:layout_marginTop="8dp" android:text="Guardar avistamiento" />
+        <Button android:id="@+id/botonVolverDetalle" android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:text="Volver al catálogo" />
     </LinearLayout>
 </ScrollView>
