@@ -3,7 +3,6 @@ package com.example.bestiario
 import android.Manifest
 import android.annotation.SuppressLint
 import android.content.pm.PackageManager
-import android.graphics.Bitmap
 import android.location.Location
 import android.media.MediaPlayer
 import android.os.Bundle
@@ -21,6 +20,7 @@ import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.Priority
 import kotlinx.coroutines.launch
 import java.io.File
+import java.util.Locale
 
 class DetalleActivity : ComponentActivity() {
 
@@ -31,11 +31,9 @@ class DetalleActivity : ComponentActivity() {
 
     private var latitud: Double? = null
     private var longitud: Double? = null
-
     private var fotoPath: String? = null
     private var archivoFotoActual: File? = null
 
-    // Cámara
     private val pedirPermisoCamara = registerForActivityResult(
         ActivityResultContracts.RequestPermission()
     ) { concedido ->
@@ -45,7 +43,7 @@ class DetalleActivity : ComponentActivity() {
 
     private val hacerFoto = registerForActivityResult(
         ActivityResultContracts.TakePicture()
-    ) { exito: Boolean ->
+    ) { exito ->
         val archivo = archivoFotoActual
         if (exito && archivo != null) {
             fotoPath = archivo.absolutePath
@@ -55,7 +53,6 @@ class DetalleActivity : ComponentActivity() {
         }
     }
 
-    // Ubicación
     private val pedirPermisosUbicacion = registerForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
     ) { resultado ->
@@ -75,14 +72,18 @@ class DetalleActivity : ComponentActivity() {
 
         findViewById<Button>(R.id.btnFoto).setOnClickListener { pulsarBotonFoto() }
         findViewById<Button>(R.id.btnUbicacion).setOnClickListener { pulsarBotonUbicacion() }
+        findViewById<Button>(R.id.botonVolverDetalle).setOnClickListener { finish() }
 
-        val index = intent.getIntExtra("MONSTRUO_INDEX", 0)
+        val index = intent.getIntExtra(EXTRA_MONSTRUO_INDEX, -1)
         lifecycleScope.launch {
-            val monstruo = Catalogo.todos(this@DetalleActivity)[index]
+            val monstruo = Catalogo.todos(this@DetalleActivity).getOrNull(index)
+            if (monstruo == null) {
+                Toast.makeText(this@DetalleActivity, "No se ha encontrado ese monstruo", Toast.LENGTH_SHORT).show()
+                finish()
+                return@launch
+            }
             mostrar(monstruo)
         }
-
-        findViewById<Button>(R.id.botonVolverDetalle).setOnClickListener { finish() }
     }
 
     private fun pulsarBotonFoto() {
@@ -122,13 +123,21 @@ class DetalleActivity : ComponentActivity() {
         clienteUbicacion
             .getCurrentLocation(Priority.PRIORITY_HIGH_ACCURACY, null)
             .addOnSuccessListener { ubicacion: Location? ->
+                if (isFinishing || isDestroyed) return@addOnSuccessListener
+
                 if (ubicacion != null) {
                     latitud = ubicacion.latitude
                     longitud = ubicacion.longitude
-                    tvUbicacion.text = "Ubicación: " + "%.4f".format(ubicacion.latitude) +
-                            ", " + "%.4f".format(ubicacion.longitude)
+                    tvUbicacion.text = "Ubicación: %.4f, %.4f".format(
+                        Locale.US, ubicacion.latitude, ubicacion.longitude
+                    )
                 } else {
                     Toast.makeText(this, "No se ha podido obtener la ubicación", Toast.LENGTH_SHORT).show()
+                }
+            }
+            .addOnFailureListener {
+                if (!isFinishing && !isDestroyed) {
+                    Toast.makeText(this, "Error al obtener la ubicación", Toast.LENGTH_SHORT).show()
                 }
             }
     }
@@ -139,65 +148,81 @@ class DetalleActivity : ComponentActivity() {
         if (bitmapMonstruo != null) imagenDetalle.setImageBitmap(bitmapMonstruo)
         else imagenDetalle.setImageResource(monstruo.imagenRes)
 
-        //findViewById<ImageView>(R.id.imagenDetalle).setImageResource(monstruo.imagenRes)
         findViewById<TextView>(R.id.nombreDetalle).text = monstruo.nombre
         findViewById<TextView>(R.id.descripcionDetalle).text = monstruo.descripcion
 
-        reproductor = MediaPlayer.create(this, monstruo.sonidoRes)
+        // Libera cualquier sonido anterior antes de preparar el nuevo.
+        reproductor?.release()
+        reproductor = monstruo.sonidoRes?.let { MediaPlayer.create(this, it) }
         reproductor?.start()
 
         val etLugar = findViewById<EditText>(R.id.etLugar)
         val dao = AppDatabase.obtener(this).avistamientoDao()
-        findViewById<Button>(R.id.btnRegistrar).setOnClickListener {
+        val botonRegistrar = findViewById<Button>(R.id.btnRegistrar)
+        botonRegistrar.setOnClickListener {
             val lugar = etLugar.text.toString().trim()
             if (lugar.isEmpty()) {
                 Toast.makeText(this, "Escribe dónde lo has visto", Toast.LENGTH_SHORT).show()
             } else {
+                botonRegistrar.isEnabled = false
                 lifecycleScope.launch {
-                    dao.insertar(
-                        Avistamiento(
-                            monstruo = monstruo.nombre,
-                            lugar = lugar,
-                            fecha = System.currentTimeMillis(),
-                            latitud = latitud,
-                            longitud = longitud,
-                            fotoPath = fotoPath
+                    try {
+                        dao.insertar(
+                            Avistamiento(
+                                monstruo = monstruo.nombre,
+                                lugar = lugar,
+                                fecha = System.currentTimeMillis(),
+                                latitud = latitud,
+                                longitud = longitud,
+                                fotoPath = fotoPath
+                            )
                         )
-                    )
-                    Toast.makeText(this@DetalleActivity, "Avistamiento guardado", Toast.LENGTH_SHORT).show()
-                    etLugar.text.clear()
-                    // limpiamos para que el siguiente avistamiento no reutilice esta foto ni esta ubicación
-                    fotoPath = null
-                    latitud = null
-                    longitud = null
-                    ivFoto.setImageDrawable(null)
-                    tvUbicacion.text = "Ubicación: sin obtener"
+                        Toast.makeText(this@DetalleActivity, "Avistamiento guardado", Toast.LENGTH_SHORT).show()
+                        etLugar.text.clear()
+                        fotoPath = null
+                        latitud = null
+                        longitud = null
+                        archivoFotoActual = null
+                        ivFoto.setImageDrawable(null)
+                        tvUbicacion.text = "Ubicación: sin obtener"
+                    } catch (e: Exception) {
+                        Toast.makeText(this@DetalleActivity, "No se ha podido guardar el avistamiento", Toast.LENGTH_SHORT).show()
+                    } finally {
+                        botonRegistrar.isEnabled = true
+                    }
                 }
             }
         }
 
-        val prefs = getSharedPreferences("MisDatos", MODE_PRIVATE)
+        val preferencias = getSharedPreferences("MisDatos", MODE_PRIVATE)
         val botonFavorito = findViewById<Button>(R.id.botonFavorito)
 
         fun actualizarTextoBoton() {
-            val favoritos = prefs.getStringSet("FAVORITOS", setOf()) ?: setOf()
-            botonFavorito.text = if (favoritos.contains(monstruo.nombre))
-                "Quitar de favoritos" else "Añadir a favoritos"
+            val favoritos = preferencias.getStringSet("FAVORITOS", emptySet()) ?: emptySet()
+            botonFavorito.text = if (monstruo.nombre in favoritos) {
+                "Quitar de favoritos"
+            } else {
+                "Añadir a favoritos"
+            }
         }
-        actualizarTextoBoton()
 
+        actualizarTextoBoton()
         botonFavorito.setOnClickListener {
-            val favoritos = (prefs.getStringSet("FAVORITOS", setOf()) ?: setOf()).toMutableSet()
-            if (favoritos.contains(monstruo.nombre)) favoritos.remove(monstruo.nombre)
+            val favoritos = (preferencias.getStringSet("FAVORITOS", emptySet()) ?: emptySet()).toMutableSet()
+            if (monstruo.nombre in favoritos) favoritos.remove(monstruo.nombre)
             else favoritos.add(monstruo.nombre)
-            prefs.edit().putStringSet("FAVORITOS", favoritos).apply()
+            preferencias.edit().putStringSet("FAVORITOS", favoritos).apply()
             actualizarTextoBoton()
         }
     }
 
     override fun onDestroy() {
-        super.onDestroy()
         reproductor?.release()
         reproductor = null
+        super.onDestroy()
+    }
+
+    companion object {
+        const val EXTRA_MONSTRUO_INDEX = "MONSTRUO_INDEX"
     }
 }
