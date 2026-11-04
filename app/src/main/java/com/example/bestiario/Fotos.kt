@@ -31,20 +31,21 @@ object Fotos {
     fun copiarDesdeUri(context: Context, uri: Uri): String? {
         var destino: File? = null
         return try {
-            destino = crearArchivo(context)
+            val archivo = crearArchivo(context)
+            destino = archivo
             val entrada = context.contentResolver.openInputStream(uri)
                 ?: throw IllegalStateException("No se ha podido abrir la imagen")
 
             entrada.use { origen ->
-                destino.outputStream().use { salida ->
+                archivo.outputStream().use { salida ->
                     origen.copyTo(salida)
                 }
             }
 
-            if (destino.length() == 0L) {
+            if (archivo.length() == 0L) {
                 throw IllegalStateException("La imagen está vacía")
             }
-            destino.absolutePath
+            archivo.absolutePath
         } catch (e: Exception) {
             destino?.delete() // Evita dejar archivos incompletos.
             null
