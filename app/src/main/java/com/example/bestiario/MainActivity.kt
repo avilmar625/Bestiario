@@ -15,24 +15,18 @@ import com.example.bestiario.data.BestiarioRepository
 import kotlinx.coroutines.launch
 import java.util.Locale
 
-/**
- * Pantalla principal: coordina la interfaz y delega la lectura de datos al repositorio.
- */
 class MainActivity : ComponentActivity() {
-
     private lateinit var recycler: RecyclerView
     private lateinit var buscador: EditText
     private lateinit var tvContador: TextView
     private lateinit var repositorio: BestiarioRepository
     private var monstruos = emptyList<Monstruo>()
     private var filtroActual = Filtro.TODOS
-
     private enum class Filtro { TODOS, ORIGINALES, CREADOS }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-
         repositorio = BestiarioRepository(this)
         recycler = findViewById(R.id.recyclerMonstruos)
         buscador = findViewById(R.id.etBuscarMonstruo)
@@ -42,29 +36,20 @@ class MainActivity : ComponentActivity() {
         findViewById<Button>(R.id.btnTodos).setOnClickListener { cambiarFiltro(Filtro.TODOS) }
         findViewById<Button>(R.id.btnOriginales).setOnClickListener { cambiarFiltro(Filtro.ORIGINALES) }
         findViewById<Button>(R.id.btnCreados).setOnClickListener { cambiarFiltro(Filtro.CREADOS) }
-
         buscador.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) = Unit
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                mostrarLista()
-            }
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) = mostrarLista()
             override fun afterTextChanged(s: Editable?) = Unit
         })
-
-        findViewById<Button>(R.id.botonFavoritos).setOnClickListener {
-            startActivity(Intent(this, FavoritosActivity::class.java))
-        }
-        findViewById<Button>(R.id.btnDiario).setOnClickListener {
-            startActivity(Intent(this, AvistamientoActivity::class.java))
-        }
-        findViewById<Button>(R.id.btnCrearMonstruo).setOnClickListener {
-            startActivity(Intent(this, CrearMonstruoActivity::class.java))
-        }
-        findViewById<Button>(R.id.btnEstadisticas).setOnClickListener {
-            startActivity(Intent(this, EstadisticasActivity::class.java))
-        }
+        findViewById<Button>(R.id.botonFavoritos).setOnClickListener { abrir(FavoritosActivity::class.java) }
+        findViewById<Button>(R.id.btnDiario).setOnClickListener { abrir(AvistamientoActivity::class.java) }
+        findViewById<Button>(R.id.btnCrearMonstruo).setOnClickListener { abrir(CrearMonstruoActivity::class.java) }
+        findViewById<Button>(R.id.btnEstadisticas).setOnClickListener { abrir(EstadisticasActivity::class.java) }
         findViewById<Button>(R.id.btnAleatorio).setOnClickListener { abrirMonstruoAleatorio() }
+        findViewById<Button>(R.id.btnExplorarOnline).setOnClickListener { abrir(ExplorarOnlineActivity::class.java) }
     }
+
+    private fun abrir(clase: Class<*>) = startActivity(Intent(this, clase))
 
     override fun onResume() {
         super.onResume()
@@ -79,46 +64,33 @@ class MainActivity : ComponentActivity() {
         mostrarLista()
     }
 
-    private fun mostrarLista() {
+    private fun filtrar(): List<Monstruo> {
         val consulta = buscador.text.toString().trim().lowercase(Locale.getDefault())
-        val filtrados = monstruos.filter { monstruo ->
+        return monstruos.filter { monstruo ->
             val coincideTexto = monstruo.nombre.lowercase(Locale.getDefault()).contains(consulta) ||
                 monstruo.descripcion.lowercase(Locale.getDefault()).contains(consulta)
             val coincideTipo = when (filtroActual) {
                 Filtro.TODOS -> true
-                Filtro.ORIGINALES -> monstruo.sonidoRes != null
-                Filtro.CREADOS -> monstruo.sonidoRes == null
+                Filtro.ORIGINALES -> monstruo.idUsuario == null
+                Filtro.CREADOS -> monstruo.idUsuario != null
             }
             coincideTexto && coincideTipo
         }
-
-        tvContador.text = "${filtrados.size} criaturas"
-        recycler.adapter = MonstruoAdapter(filtrados) { monstruo ->
-            abrirDetalle(monstruo)
-        }
     }
 
-    private fun abrirDetalle(monstruo: Monstruo) {
-        val indice = monstruos.indexOf(monstruo)
-        if (indice >= 0) {
-            startActivity(Intent(this, DetalleActivity::class.java).apply {
-                putExtra(DetalleActivity.EXTRA_MONSTRUO_INDEX, indice)
-            })
+    private fun mostrarLista() {
+        val filtrados = filtrar()
+        tvContador.text = "${filtrados.size} criaturas"
+        recycler.adapter = MonstruoAdapter(filtrados) { monstruo ->
+            val indice = monstruos.indexOf(monstruo)
+            if (indice >= 0) startActivity(Intent(this, DetalleActivity::class.java).putExtra(DetalleActivity.EXTRA_MONSTRUO_INDEX, indice))
         }
     }
 
     private fun abrirMonstruoAleatorio() {
-        val consulta = buscador.text.toString().trim().lowercase(Locale.getDefault())
-        val candidatos = monstruos.filter { monstruo ->
-            val coincideTexto = monstruo.nombre.lowercase(Locale.getDefault()).contains(consulta) ||
-                monstruo.descripcion.lowercase(Locale.getDefault()).contains(consulta)
-            val coincideTipo = when (filtroActual) {
-                Filtro.TODOS -> true
-                Filtro.ORIGINALES -> monstruo.sonidoRes != null
-                Filtro.CREADOS -> monstruo.sonidoRes == null
-            }
-            coincideTexto && coincideTipo
-        }
-        candidatos.randomOrNull()?.let { abrirDetalle(it) }
+        val elegido = filtrar().randomOrNull()
+        if (elegido == null) return
+        val indice = monstruos.indexOf(elegido)
+        startActivity(Intent(this, DetalleActivity::class.java).putExtra(DetalleActivity.EXTRA_MONSTRUO_INDEX, indice))
     }
 }
