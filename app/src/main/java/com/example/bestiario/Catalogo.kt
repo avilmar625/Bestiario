@@ -31,6 +31,7 @@ object Catalogo {
         )
     )
 
+    // Combina el catálogo fijo con los monstruos que el usuario ha guardado en Room.
     suspend fun todos(context: Context): List<Monstruo> {
         val propios = AppDatabase.obtener(context)
             .monstruoUsuarioDao()
@@ -40,7 +41,7 @@ object Catalogo {
                     nombre = monstruo.nombre,
                     descripcion = monstruo.descripcion,
                     imagenRes = android.R.drawable.ic_menu_help,
-                    sonidoRes = originales.first().sonidoRes,
+                    sonidoRes = null,
                     fotoPath = monstruo.fotoPath
                 )
             }
