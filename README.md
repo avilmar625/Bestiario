@@ -128,6 +128,8 @@ La base de datos local se llama `bestiario_db` y actualmente utiliza la versión
 | `MonstruoAdapter.kt` | Convierte cada objeto del catálogo en una fila del RecyclerView. |
 | `AvistamientoAdapter.kt` | Muestra los datos de cada avistamiento y solicita confirmación antes de borrarlo. |
 | `Fotos.kt` | Crea archivos privados para las fotografías, genera URI mediante FileProvider, copia imágenes de la galería y carga versiones reducidas para mostrarlas. |
+| `ReproductorMonstruo.kt` | Encapsula la reproducción y liberación de los sonidos, incluidos los casos en los que el monstruo no tiene audio. |
+| `ServicioUbicacion.kt` | Encapsula la consulta a Fused Location Provider. La Activity sigue siendo responsable de solicitar y comprobar los permisos. |
 
 ### Recursos Android
 
