@@ -13,6 +13,7 @@ class AvistamientoActivity : ComponentActivity() {
 
     private lateinit var recycler: RecyclerView
     private lateinit var tvContador: TextView
+    private val dao by lazy { AppDatabase.obtener(this).avistamientoDao() }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -26,19 +27,17 @@ class AvistamientoActivity : ComponentActivity() {
 
     override fun onResume() {
         super.onResume()
-        cargarLista()
+        lifecycleScope.launch { actualizarLista() }
     }
 
-    private fun cargarLista() {
-        val dao = AppDatabase.obtener(this).avistamientoDao()
-        lifecycleScope.launch {
-            val lista = dao.obtenerTodos()
-            tvContador.text = "Avistamientos registrados: " + lista.size
-            recycler.adapter = AvistamientoAdapter(lista) { avistamiento ->
-                lifecycleScope.launch {
-                    dao.borrar(avistamiento)
-                    cargarLista()
-                }
+    // Es suspend para poder reutilizarla sin crear corrutinas anidadas.
+    private suspend fun actualizarLista() {
+        val lista = dao.obtenerTodos()
+        tvContador.text = "Avistamientos registrados: ${lista.size}"
+        recycler.adapter = AvistamientoAdapter(lista) { avistamiento ->
+            lifecycleScope.launch {
+                dao.borrar(avistamiento)
+                actualizarLista()
             }
         }
     }
