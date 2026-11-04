@@ -1,183 +1,143 @@
-# Bestiario
+# Bestiario · AppMejorada3
 
-Aplicación Android para consultar un pequeño catálogo de monstruos, crear criaturas propias y llevar un diario de sus avistamientos. El proyecto está desarrollado con Kotlin, vistas XML y AndroidX.
+Aplicación Android de exploración de criaturas y leyendas. Esta versión evoluciona el proyecto anterior con una interfaz renovada, búsqueda y filtros, selección aleatoria, estadísticas y una primera separación entre interfaz y acceso a datos.
 
-Esta documentación incluye una guía de uso y una explicación de la organización interna del código.
+**Tecnologías:** Kotlin, XML, AndroidX, Room, RecyclerView, corrutinas, SharedPreferences, cámara, selector de imágenes, GPS y MediaPlayer.
 
-## 1. Funcionalidades
+## 1. Novedades de AppMejorada3
 
-- Consultar los monstruos incluidos en el catálogo.
-- Abrir la ficha de cada monstruo y escuchar su sonido, cuando dispone de uno.
-- Marcar y desmarcar monstruos como favoritos.
+### Catálogo renovado
+- Diseño oscuro con tonos azul petróleo y detalles dorados.
+- Tarjetas con imagen, nombre, descripción y etiqueta de tipo.
+- Búsqueda inmediata por nombre o descripción.
+- Filtros para ver todas las criaturas, las leyendas originales o las creadas por el usuario.
+- Botón para abrir una criatura aleatoria entre los resultados que se están mostrando.
+
+### Estadísticas
+Nueva pantalla **Tu actividad**, con datos calculados a partir del diario:
+- Número total de avistamientos.
+- Número de criaturas distintas observadas.
+- Número de lugares diferentes registrados.
+- Criatura más avistada.
+- Fecha y criatura del último registro.
+
+Las estadísticas se recalculan al abrir la pantalla; no se almacenan valores duplicados.
+
+### Organización del código
+- Se incorpora `BestiarioRepository`, una primera capa de acceso a datos entre las pantallas y Room/catálogo.
+- `MainActivity` delega la carga del catálogo en el repositorio.
+- Se mantiene el modelo de monstruo común para criaturas originales y personalizadas.
+- Las operaciones de base de datos siguen realizándose mediante corrutinas ligadas al ciclo de vida.
+
+## 2. Funcionalidades anteriores
+- Consultar los monstruos originales y reproducir sus sonidos.
+- Marcar y desmarcar favoritos.
 - Crear monstruos propios con nombre, descripción y fotografía opcional.
-- Hacer fotografías con la cámara o seleccionar imágenes de la galería.
-- Registrar avistamientos indicando el lugar, la fecha, una fotografía opcional y las coordenadas GPS opcionales.
-- Consultar el diario de avistamientos y borrar registros con una pulsación larga y confirmación.
+- Hacer fotografías con la cámara o elegir imágenes de la galería.
+- Registrar avistamientos con lugar, fecha, foto opcional y coordenadas GPS opcionales.
+- Consultar el diario y borrar registros mediante pulsación larga y confirmación.
 
-Los monstruos originales forman parte del código. Los monstruos creados por el usuario y los avistamientos se guardan en una base de datos local. Los favoritos se guardan mediante preferencias compartidas.
-
-## 2. Cómo utilizar la aplicación
+## 3. Guía de uso
 
 ### Pantalla principal
+1. Escribe en el buscador para filtrar por nombre o descripción.
+2. Usa **Todos**, **Leyendas** o **Mis criaturas** para cambiar el tipo de resultados.
+3. Pulsa una tarjeta para abrir la ficha.
+4. Pulsa **Sorpréndeme** para abrir una criatura aleatoria dentro del resultado filtrado.
+5. Usa la barra inferior para entrar en Favoritos, Diario o Estadísticas.
+6. Pulsa **Crear mi criatura** para añadir una nueva.
 
-Al abrir la aplicación aparece el catálogo de monstruos. Toca una fila para entrar en la ficha del monstruo.
+### Ficha de una criatura
+Consulta su imagen, nombre y descripción. Puedes añadirla o quitarla de favoritos, indicar dónde la has visto, hacer una fotografía, solicitar las coordenadas y registrar el avistamiento. El lugar es obligatorio; la foto y las coordenadas son opcionales.
 
-Desde esta pantalla también se puede acceder a:
-- **Ver mis favoritos**: muestra los monstruos marcados como favoritos.
-- **Diario de avistamientos**: consulta los registros guardados.
-- **Crear monstruo**: abre el formulario para añadir una criatura propia.
+La ubicación se almacena como latitud y longitud. No se convierte automáticamente en una dirección o nombre de ciudad.
 
-### Ficha de un monstruo
+### Crear una criatura
+Introduce nombre y descripción. Puedes añadir una foto con la cámara o con el selector de imágenes. La imagen es opcional.
 
-En la ficha se muestra su imagen, nombre y descripción. Si el monstruo tiene un sonido asociado, se reproduce al abrir la pantalla.
+### Diario y estadísticas
+El diario muestra los registros guardados. Mantén pulsada una fila para iniciar el borrado y confirma en el diálogo. La pantalla de estadísticas resume los datos existentes y se actualiza al volver a abrirla.
 
-- **Añadir a favoritos / Quitar de favoritos**: cambia el estado de favorito.
-- **¿Dónde lo has visto?**: escribe el lugar o una descripción del sitio.
-- **Hacer foto del avistamiento**: abre la cámara. La fotografía se adjuntará al próximo registro.
-- **Obtener mi ubicación**: solicita permiso de ubicación si todavía no se ha concedido e intenta obtener las coordenadas actuales.
-- **Registrar avistamiento**: guarda el registro. Es necesario indicar un lugar; la foto y las coordenadas son opcionales.
+## 4. Permisos
 
-Después de guardar, el formulario limpia la foto y las coordenadas para evitar que se reutilicen accidentalmente en el siguiente registro.
-
-La ubicación se guarda como latitud y longitud. La aplicación no convierte actualmente esas coordenadas en el nombre de una ciudad o dirección.
-
-### Crear un monstruo
-
-Es necesario introducir un nombre y una descripción. La imagen es opcional y puede obtenerse de dos maneras:
-- **Hacer foto**: utiliza la cámara del dispositivo.
-- **Elegir de la galería**: abre el selector de imágenes de Android.
-
-Al pulsar **Guardar monstruo**, la criatura se almacena y aparecerá en el catálogo principal. Los monstruos personalizados no tienen un sonido propio asignado.
-
-### Favoritos
-
-La pantalla de favoritos muestra los monstruos marcados. Para quitar uno de la lista, entra en su ficha y pulsa **Quitar de favoritos**.
-
-### Diario de avistamientos
-
-Se muestran los registros ordenados del más reciente al más antiguo. Cada fila puede incluir monstruo, lugar, fecha, coordenadas y fotografía.
-
-Para borrar un registro, mantén pulsada su fila y confirma la operación en el diálogo.
-
-## 3. Permisos
-
-Android solicita los permisos cuando se intenta utilizar la función correspondiente:
-
-| Permiso | Para qué se utiliza |
+| Permiso | Uso |
 |---|---|
-| Cámara | Hacer fotografías del monstruo o del avistamiento |
-| Ubicación precisa o aproximada | Obtener las coordenadas del avistamiento |
+| Cámara | Fotografiar criaturas y avistamientos |
+| Ubicación precisa o aproximada | Obtener coordenadas del dispositivo |
 
-La aplicación puede utilizarse sin conceder estos permisos, pero las funciones asociadas no estarán disponibles. La selección de imágenes de la galería utiliza el selector visual del sistema Android.
+Los permisos se solicitan cuando se utiliza la función correspondiente. Se puede utilizar el resto de la aplicación sin concederlos. La galería utiliza el selector visual del sistema Android.
 
-## 4. Tecnologías utilizadas
+## 5. Arquitectura y organización
 
-- **Kotlin** como lenguaje principal.
-- **Layouts XML** para las interfaces.
-- **Activities e Intents** para navegar entre pantallas.
-- **RecyclerView** y adaptadores para mostrar catálogos y registros.
-- **Room** para almacenar monstruos personalizados y avistamientos.
-- **SharedPreferences** para guardar los favoritos.
-- **Kotlin Coroutines** y `lifecycleScope` para ejecutar operaciones de base de datos sin bloquear la interfaz.
-- **Activity Result API** para gestionar cámara, selector de imágenes y solicitudes de permisos.
-- **FileProvider** para compartir de forma segura con la cámara los archivos de imagen creados por la aplicación.
-- **Fused Location Provider** para obtener la ubicación del dispositivo.
-- **MediaPlayer** para reproducir los sonidos de los monstruos originales.
+Código Kotlin: `app/src/main/java/com/example/bestiario/`
 
-## 5. Organización interna del proyecto
-
-El código Kotlin se encuentra en:
-
-`app/src/main/java/com/example/bestiario/`
-
-### Pantallas (Activities)
-
-| Archivo | Responsabilidad |
+| Archivo / paquete | Responsabilidad |
 |---|---|
-| `MainActivity.kt` | Pantalla inicial. Carga el catálogo y permite navegar a las demás secciones. |
-| `DetalleActivity.kt` | Muestra la ficha de un monstruo, gestiona favoritos, cámara, ubicación y registro de avistamientos. |
-| `CrearMonstruoActivity.kt` | Recoge los datos de una criatura propia y permite añadir una fotografía. |
-| `FavoritosActivity.kt` | Filtra el catálogo según los nombres guardados como favoritos. |
-| `AvistamientoActivity.kt` | Consulta y actualiza la lista de avistamientos guardados. |
+| `MainActivity.kt` | Pantalla principal, búsqueda, filtros y navegación |
+| `DetalleActivity.kt` | Ficha, favoritos, cámara, GPS y registro |
+| `CrearMonstruoActivity.kt` | Formulario de creación |
+| `FavoritosActivity.kt` | Lista de favoritos |
+| `AvistamientoActivity.kt` | Diario de registros |
+| `EstadisticasActivity.kt` | Cálculo y presentación de estadísticas |
+| `Monstruo.kt` | Modelo de criatura |
+| `Catalogo.kt` | Catálogo fijo y combinación con criaturas propias |
+| `data/BestiarioRepository.kt` | Punto de acceso a los datos para las pantallas |
+| `AppDatabase.kt` | Configuración y acceso a Room |
+| `Avistamiento.kt`, `AvistamientoDAO.kt` | Entidad y operaciones del diario |
+| `MonstruoUsuario.kt`, `MonstruoUsuarioDao.kt` | Entidad y operaciones de criaturas propias |
+| `MonstruoAdapter.kt` | Tarjetas del catálogo |
+| `AvistamientoAdapter.kt` | Filas del diario |
+| `Fotos.kt` | Creación, copia y carga de imágenes |
+| `ReproductorMonstruo.kt` | Reproducción y liberación de audio |
+| `ServicioUbicacion.kt` | Consulta de ubicación |
 
-### Modelo y catálogo
-
-| Archivo | Responsabilidad |
-|---|---|
-| `Monstruo.kt` | Modelo que representa un monstruo mostrado en la aplicación. Incluye nombre, descripción, recurso de imagen, sonido opcional y ruta de fotografía opcional. |
-| `Catalogo.kt` | Define los monstruos originales y combina esa lista con los monstruos personalizados recuperados de Room. |
-
-El catálogo devuelve una lista común de objetos `Monstruo`, de modo que la interfaz puede mostrar juntos los elementos originales y los creados por el usuario.
-
-### Persistencia: Room
-
-| Archivo | Responsabilidad |
-|---|---|
-| `AppDatabase.kt` | Define la base de datos Room y proporciona una instancia compartida. |
-| `MonstruoUsuario.kt` | Entidad que representa los monstruos creados por el usuario. |
-| `MonstruoUsuarioDao.kt` | Operaciones para insertar, consultar y borrar monstruos personalizados. |
-| `Avistamiento.kt` | Entidad que representa un registro del diario. |
-| `AvistamientoDAO.kt` | Operaciones para insertar, consultar y borrar avistamientos. |
-
-La base de datos local se llama `bestiario_db` y actualmente utiliza la versión de esquema **4**. No se ha activado el borrado automático de la base de datos ante cambios de esquema: si en una ampliación futura se modifican las entidades, habrá que implementar y probar una migración de Room antes de distribuir esa versión.
-
-### Adaptadores y utilidades
-
-| Archivo | Responsabilidad |
-|---|---|
-| `MonstruoAdapter.kt` | Convierte cada objeto del catálogo en una fila del RecyclerView. |
-| `AvistamientoAdapter.kt` | Muestra los datos de cada avistamiento y solicita confirmación antes de borrarlo. |
-| `Fotos.kt` | Crea archivos privados para las fotografías, genera URI mediante FileProvider, copia imágenes de la galería y carga versiones reducidas para mostrarlas. |
-| `ReproductorMonstruo.kt` | Encapsula la reproducción y liberación de los sonidos, incluidos los casos en los que el monstruo no tiene audio. |
-| `ServicioUbicacion.kt` | Encapsula la consulta a Fused Location Provider. La Activity sigue siendo responsable de solicitar y comprobar los permisos. |
+### ¿Qué aporta Repository?
+Antes, una pantalla podía consultar directamente el DAO de Room o el catálogo. Ahora `BestiarioRepository` ofrece operaciones con nombres orientados a lo que necesita la aplicación, por ejemplo `obtenerMonstruos()` y `obtenerAvistamientos()`. Esto reduce el conocimiento que necesita cada Activity sobre el origen de los datos y prepara el proyecto para incorporar ViewModel y Flow más adelante. Es una primera capa de organización, no una implementación completa de MVVM.
 
 ### Recursos Android
+- `res/layout/`: interfaces XML.
+- `res/drawable/`: imágenes y fondos de tarjetas/campos.
+- `res/raw/`: sonidos originales.
+- `res/values/`: colores y tema.
+- `res/xml/file_paths.xml`: rutas compartidas mediante FileProvider.
+- `AndroidManifest.xml`: Activities, proveedor y permisos.
 
-Los recursos de interfaz se encuentran en `app/src/main/res/`:
-- `layout/`: diseños XML de las pantallas y filas de los RecyclerView.
-- `drawable/`: imágenes de los monstruos originales y otros recursos gráficos.
-- `raw/`: sonidos de los monstruos originales.
-- `xml/file_paths.xml`: rutas que FileProvider puede compartir con otras aplicaciones.
-- `values/`: temas, colores y otros valores de interfaz.
+## 6. Persistencia
+- Monstruos originales: definidos en `Catalogo.kt`.
+- Criaturas personalizadas: tabla `monstruos_usuario` de Room.
+- Avistamientos: tabla `avistamientos` de Room.
+- Favoritos: conjunto de nombres en SharedPreferences (`MisDatos`, clave `FAVORITOS`).
+- Fotografías: archivos privados de la aplicación; la base de datos guarda su ruta.
 
-El manifiesto está en `app/src/main/AndroidManifest.xml`. Declara las Activities, el proveedor de archivos y los permisos de cámara y ubicación.
+La base de datos se llama `bestiario_db` y mantiene el esquema de Room versión **4**. No se ha modificado el esquema en esta ampliación. Si una futura versión cambia entidades o columnas, habrá que crear y probar una migración antes de distribuirla. No se debe activar el borrado automático como sustituto de una migración.
 
-## 6. Cómo se guardan los datos
+## 7. Configuración y ejecución
+1. Clona el repositorio o descarga la rama `AppMejorada3`.
+2. Abre el proyecto en Android Studio.
+3. Espera a que finalice la sincronización de Gradle.
+4. Compila y ejecuta en un dispositivo o emulador.
 
-- **Monstruos originales**: están definidos en `Catalogo.kt`; no se insertan en Room.
-- **Monstruos personalizados**: sus datos se guardan en la tabla `monstruos_usuario`.
-- **Avistamientos**: se guardan en la tabla `avistamientos`, incluyendo fecha en milisegundos, lugar, coordenadas opcionales y ruta de la foto.
-- **Favoritos**: se guardan como un conjunto de nombres en las preferencias `MisDatos`, bajo la clave `FAVORITOS`.
-- **Fotografías**: se guardan como archivos en el almacenamiento privado de la aplicación. En Room se almacena la ruta del archivo, no la imagen completa.
+Configuración declarada: namespace y aplicación `com.example.bestiario`, minSdk 24, targetSdk 36 y compileSdk 37.
 
-Al desinstalar la aplicación, Android elimina sus datos privados locales.
+Para probar cámara y GPS, es recomendable un dispositivo físico. En un emulador configura una cámara virtual y una ubicación desde sus controles.
 
-## 7. Abrir y ejecutar el proyecto
+## 8. Ideas para próximas versiones
+- Google Maps para representar los avistamientos.
+- Geocoder para convertir coordenadas en ciudad o dirección.
+- ViewModel y StateFlow para separar aún más la interfaz de la lógica.
+- Flow de Room para actualizar listas automáticamente.
+- Edición y borrado de criaturas personalizadas.
+- Filtros del diario por fecha, criatura y lugar.
+- Exportación e importación de una copia de seguridad.
+- Pruebas unitarias y de interfaz.
 
-1. Clona el repositorio o descarga la rama que quieras utilizar.
-2. Abre la carpeta del proyecto en Android Studio.
-3. Espera a que termine la sincronización de Gradle.
-4. Ejecuta la aplicación en un dispositivo o emulador compatible.
+## 9. Comprobaciones pendientes
+Los cambios se han incorporado al repositorio remoto, pero no se ha ejecutado Android Studio ni un build de Gradle en un entorno de compilación. Antes de utilizar esta rama en clase:
+1. Sincroniza Gradle.
+2. Ejecuta **Build > Make Project**.
+3. Prueba búsqueda, filtros y selección aleatoria.
+4. Crea una criatura, registra varios avistamientos y comprueba las estadísticas.
+5. Comprueba cámara, galería, permisos y GPS en dispositivo o emulador.
+6. Verifica que los favoritos y los datos existentes de Room siguen disponibles.
 
-Configuración declarada actualmente:
-- Paquete: `com.example.bestiario`
-- `minSdk`: 24
-- `targetSdk`: 36
-- `compileSdk`: 37
-
-Para probar la cámara y la ubicación, es preferible utilizar un dispositivo físico. En un emulador hay que configurar una cámara virtual y establecer una ubicación desde los controles del propio emulador.
-
-## 8. Posibles ampliaciones
-
-Algunas mejoras que encajan con la estructura actual y pueden servir para seguir aprendiendo:
-- Mostrar la ciudad o dirección a partir de las coordenadas mediante Geocoder.
-- Integrar Google Maps para visualizar los avistamientos.
-- Separar progresivamente la lógica de las Activities mediante Repository y ViewModel.
-- Utilizar Flow para observar cambios de Room.
-- Añadir migraciones de Room cuando cambie el modelo de datos.
-- Permitir editar y eliminar monstruos personalizados.
-- Añadir pruebas unitarias y de interfaz.
-
----
-
-**Nota de desarrollo:** esta documentación describe el código de la rama `AppMejorada2`. Antes de dar por terminada una modificación, sincroniza Gradle y compila y ejecuta la aplicación en Android Studio; la actualización remota del repositorio no sustituye esa comprobación.
+**Objetivo didáctico:** que el alumnado pueda reconocer qué parte corresponde a interfaz, modelo, persistencia y acceso a datos, y que cada nueva funcionalidad introduzca una idea de Android que se pueda estudiar y modificar.
