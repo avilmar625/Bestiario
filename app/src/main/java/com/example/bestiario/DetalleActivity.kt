@@ -1,10 +1,7 @@
 package com.example.bestiario
 
 import android.Manifest
-import android.annotation.SuppressLint
 import android.content.pm.PackageManager
-import android.location.Location
-import android.media.MediaPlayer
 import android.os.Bundle
 import android.widget.Button
 import android.widget.EditText
@@ -15,19 +12,16 @@ import androidx.activity.ComponentActivity
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
-import com.google.android.gms.location.FusedLocationProviderClient
-import com.google.android.gms.location.LocationServices
-import com.google.android.gms.location.Priority
 import kotlinx.coroutines.launch
 import java.io.File
 import java.util.Locale
 
 class DetalleActivity : ComponentActivity() {
 
-    private var reproductor: MediaPlayer? = null
+    private lateinit var reproductor: ReproductorMonstruo
+    private lateinit var servicioUbicacion: ServicioUbicacion
     private lateinit var ivFoto: ImageView
     private lateinit var tvUbicacion: TextView
-    private lateinit var clienteUbicacion: FusedLocationProviderClient
 
     private var latitud: Double? = null
     private var longitud: Double? = null
@@ -66,9 +60,10 @@ class DetalleActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_detalle)
 
+        reproductor = ReproductorMonstruo(this)
+        servicioUbicacion = ServicioUbicacion(this)
         ivFoto = findViewById(R.id.ivFoto)
         tvUbicacion = findViewById(R.id.tvUbicacion)
-        clienteUbicacion = LocationServices.getFusedLocationProviderClient(this)
 
         findViewById<Button>(R.id.btnFoto).setOnClickListener { pulsarBotonFoto() }
         findViewById<Button>(R.id.btnUbicacion).setOnClickListener { pulsarBotonUbicacion() }
@@ -118,12 +113,10 @@ class DetalleActivity : ComponentActivity() {
         }
     }
 
-    @SuppressLint("MissingPermission")
     private fun obtenerUbicacion() {
-        clienteUbicacion
-            .getCurrentLocation(Priority.PRIORITY_HIGH_ACCURACY, null)
-            .addOnSuccessListener { ubicacion: Location? ->
-                if (isFinishing || isDestroyed) return@addOnSuccessListener
+        servicioUbicacion.obtener(
+            alObtener = { ubicacion ->
+                if (isFinishing || isDestroyed) return@obtener
 
                 if (ubicacion != null) {
                     latitud = ubicacion.latitude
@@ -134,12 +127,13 @@ class DetalleActivity : ComponentActivity() {
                 } else {
                     Toast.makeText(this, "No se ha podido obtener la ubicación", Toast.LENGTH_SHORT).show()
                 }
-            }
-            .addOnFailureListener {
+            },
+            alFallar = {
                 if (!isFinishing && !isDestroyed) {
                     Toast.makeText(this, "Error al obtener la ubicación", Toast.LENGTH_SHORT).show()
                 }
             }
+        )
     }
 
     private fun mostrar(monstruo: Monstruo) {
@@ -150,11 +144,7 @@ class DetalleActivity : ComponentActivity() {
 
         findViewById<TextView>(R.id.nombreDetalle).text = monstruo.nombre
         findViewById<TextView>(R.id.descripcionDetalle).text = monstruo.descripcion
-
-        // Libera cualquier sonido anterior antes de preparar el nuevo.
-        reproductor?.release()
-        reproductor = monstruo.sonidoRes?.let { MediaPlayer.create(this, it) }
-        reproductor?.start()
+        reproductor.reproducir(monstruo.sonidoRes)
 
         val etLugar = findViewById<EditText>(R.id.etLugar)
         val dao = AppDatabase.obtener(this).avistamientoDao()
@@ -217,8 +207,7 @@ class DetalleActivity : ComponentActivity() {
     }
 
     override fun onDestroy() {
-        reproductor?.release()
-        reproductor = null
+        reproductor.liberar()
         super.onDestroy()
     }
 
