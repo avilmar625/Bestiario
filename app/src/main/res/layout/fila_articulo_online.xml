@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="wrap_content"
+    android:layout_marginBottom="10dp" android:background="@drawable/bg_card"
+    android:orientation="vertical" android:padding="16dp"
+    android:clickable="true" android:focusable="true">
+    <TextView android:id="@+id/tvTituloArticulo" android:layout_width="match_parent"
+        android:layout_height="wrap_content" android:textColor="@color/acento"
+        android:textSize="17sp" android:textStyle="bold" />
+    <TextView android:id="@+id/tvResumenArticulo" android:layout_width="match_parent"
+        android:layout_height="wrap_content" android:layout_marginTop="7dp"
+        android:maxLines="4" android:ellipsize="end"
+        android:textColor="@color/texto_principal" android:textSize="13sp" />
+</LinearLayout>
