@@ -9,35 +9,57 @@ import java.io.File
 
 object Fotos {
 
+    // Todas las imágenes propias se guardan en el almacenamiento privado de la aplicación.
     fun crearArchivo(context: Context): File {
         val carpeta = File(context.filesDir, "fotos")
-        carpeta.mkdirs()
-        return File(carpeta, "foto_" + System.currentTimeMillis() + ".jpg")
+        if (!carpeta.exists() && !carpeta.mkdirs()) {
+            throw IllegalStateException("No se ha podido crear la carpeta de fotografías")
+        }
+        return File.createTempFile("foto_", ".jpg", carpeta)
     }
 
     fun uriDe(context: Context, archivo: File): Uri {
-        return FileProvider.getUriForFile(context, context.packageName + ".fileprovider", archivo)
+        return FileProvider.getUriForFile(
+            context,
+            context.packageName + ".fileprovider",
+            archivo
+        )
     }
 
-    // Copia una imagen elegida de la galería a la carpeta de la app y devuelve su ruta
+    // Copia la imagen elegida de la galería al almacenamiento privado de la app.
+    // Devuelve null si no se puede abrir o copiar el archivo.
     fun copiarDesdeUri(context: Context, uri: Uri): String? {
+        var destino: File? = null
         return try {
-            val destino = crearArchivo(context)
-            context.contentResolver.openInputStream(uri)?.use { entrada ->
-                destino.outputStream().use { salida -> entrada.copyTo(salida) }
+            destino = crearArchivo(context)
+            val entrada = context.contentResolver.openInputStream(uri)
+                ?: throw IllegalStateException("No se ha podido abrir la imagen")
+
+            entrada.use { origen ->
+                destino.outputStream().use { salida ->
+                    origen.copyTo(salida)
+                }
+            }
+
+            if (destino.length() == 0L) {
+                throw IllegalStateException("La imagen está vacía")
             }
             destino.absolutePath
         } catch (e: Exception) {
+            destino?.delete() // Evita dejar archivos incompletos.
             null
         }
     }
 
-    // Carga la foto reducida (1/4 de tamaño) para no gastar memoria
+    // Carga una versión reducida para consumir menos memoria.
     fun cargar(ruta: String?): Bitmap? {
-        if (ruta == null) return null
-        if (!File(ruta).exists()) return null
-        val opciones = BitmapFactory.Options()
-        opciones.inSampleSize = 4
+        if (ruta.isNullOrBlank()) return null
+        val archivo = File(ruta)
+        if (!archivo.isFile) return null
+
+        val opciones = BitmapFactory.Options().apply {
+            inSampleSize = 4
+        }
         return BitmapFactory.decodeFile(ruta, opciones)
     }
 }
