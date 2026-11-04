@@ -1,5 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <color name="fondo">#101820</color>
+    <color name="superficie">#1B2934</color>
+    <color name="borde">#30424E</color>
+    <color name="acento">#E8B86D</color>
+    <color name="texto_principal">#F4F0E8</color>
+    <color name="texto_secundario">#AAB8C2</color>
     <color name="purple_200">#FFBB86FC</color>
     <color name="purple_500">#FF6200EE</color>
     <color name="purple_700">#FF3700B3</color>
