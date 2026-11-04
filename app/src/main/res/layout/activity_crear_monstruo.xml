@@ -1,59 +1,32 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent">
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="16dp">
-
-        <EditText
-            android:id="@+id/etNombreMonstruo"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="Nombre del monstruo" />
-
-        <EditText
-            android:id="@+id/etDescripcionMonstruo"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="Descripción"
-            android:minLines="3"
-            android:gravity="top"
-            android:layout_marginTop="12dp" />
-
-        <ImageView
-            android:id="@+id/ivFotoMonstruo"
-            android:layout_width="match_parent"
-            android:layout_height="200dp"
-            android:layout_marginTop="12dp"
-            android:scaleType="centerInside" />
-
-        <Button
-            android:id="@+id/btnFotoMonstruo"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Hacer foto" />
-
-        <Button
-            android:id="@+id/btnGaleriaMonstruo"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Elegir de la galería" />
-
-        <Button
-            android:id="@+id/btnGuardarMonstruo"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Guardar monstruo"
-            android:layout_marginTop="16dp" />
-
-        <Button
-            android:id="@+id/btnVolverCrear"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Volver" />
+    android:layout_width="match_parent" android:layout_height="match_parent" android:background="@color/fondo">
+    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:orientation="vertical" android:padding="20dp">
+        <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:text="DISEÑA TU CRIATURA" android:textColor="@color/acento"
+            android:textStyle="bold" android:letterSpacing="0.12" android:textSize="12sp" />
+        <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:layout_marginTop="5dp" android:text="Dale vida a una leyenda."
+            android:textColor="@color/texto_principal" android:textSize="27sp" android:textStyle="bold" />
+        <EditText android:id="@+id/etNombreMonstruo" android:layout_width="match_parent"
+            android:layout_height="wrap_content" android:layout_marginTop="16dp"
+            android:hint="Nombre de la criatura" android:singleLine="true" />
+        <EditText android:id="@+id/etDescripcionMonstruo" android:layout_width="match_parent"
+            android:layout_height="wrap_content" android:hint="Historia y descripción"
+            android:minLines="4" android:gravity="top" android:layout_marginTop="12dp" />
+        <ImageView android:id="@+id/ivFotoMonstruo" android:layout_width="match_parent"
+            android:layout_height="210dp" android:layout_marginTop="12dp"
+            android:scaleType="centerCrop" android:contentDescription="Fotografía de la criatura" />
+        <Button android:id="@+id/btnFotoMonstruo" android:layout_width="match_parent"
+            android:layout_height="wrap_content" android:text="Hacer foto" />
+        <Button android:id="@+id/btnGaleriaMonstruo" android:layout_width="match_parent"
+            android:layout_height="wrap_content" android:text="Elegir imagen" />
+        <Button android:id="@+id/btnGuardarMonstruo" android:layout_width="match_parent"
+            android:layout_height="wrap_content" android:layout_marginTop="16dp" android:text="Guardar criatura" />
+        <Button android:id="@+id/btnEliminarMonstruo" android:layout_width="match_parent"
+            android:layout_height="wrap_content" android:text="Eliminar criatura" android:visibility="gone" />
+        <Button android:id="@+id/btnVolverCrear" android:layout_width="match_parent"
+            android:layout_height="wrap_content" android:text="Volver" />
     </LinearLayout>
 </ScrollView>
