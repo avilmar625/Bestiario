@@ -1,11 +1,14 @@
 package com.example.bestiario
 
 import android.app.AlertDialog
+import android.content.Intent
+import android.net.Uri
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -24,24 +27,17 @@ class AvistamientoAdapter(
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val vista = LayoutInflater.from(parent.context)
-            .inflate(R.layout.fila_avistamiento, parent, false)
+        val vista = LayoutInflater.from(parent.context).inflate(R.layout.fila_avistamiento, parent, false)
         return ViewHolder(vista)
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val avistamiento = lista[position]
-        val latitud = avistamiento.latitud
-        val longitud = avistamiento.longitud
-
-        val coordenadas = if (latitud != null && longitud != null) {
-            "  (%.4f, %.4f)".format(Locale.US, latitud, longitud)
-        } else {
-            ""
-        }
-
+        val lat = avistamiento.latitud
+        val lon = avistamiento.longitud
+        val coordenadas = if (lat != null && lon != null) " · %.4f, %.4f".format(Locale.US, lat, lon) else ""
         holder.tvMonstruo.text = avistamiento.monstruo
-        holder.tvLugar.text = "Visto en: ${avistamiento.lugar}$coordenadas"
+        holder.tvLugar.text = "Lugar: ${avistamiento.lugar}$coordenadas"
         holder.tvFecha.text = formatoFecha.format(Date(avistamiento.fecha))
 
         val bitmap = Fotos.cargar(avistamiento.fotoPath)
@@ -53,12 +49,20 @@ class AvistamientoAdapter(
             holder.ivFoto.visibility = View.GONE
         }
 
+        holder.itemView.setOnClickListener {
+            if (lat == null || lon == null) {
+                Toast.makeText(holder.itemView.context, "Este registro no tiene coordenadas", Toast.LENGTH_SHORT).show()
+            } else {
+                val uri = Uri.parse("geo:$lat,$lon?q=$lat,$lon(${Uri.encode(avistamiento.monstruo)})")
+                holder.itemView.context.startActivity(Intent(Intent.ACTION_VIEW, uri))
+            }
+        }
         holder.itemView.setOnLongClickListener {
             AlertDialog.Builder(holder.itemView.context)
-                .setTitle("Borrar avistamiento")
-                .setMessage("¿Quieres eliminar este registro?")
+                .setTitle("Eliminar avistamiento")
+                .setMessage("¿Quieres borrar este registro del diario?")
                 .setNegativeButton("Cancelar", null)
-                .setPositiveButton("Borrar") { _, _ -> onBorrar(avistamiento) }
+                .setPositiveButton("Eliminar") { _, _ -> onBorrar(avistamiento) }
                 .show()
             true
         }
