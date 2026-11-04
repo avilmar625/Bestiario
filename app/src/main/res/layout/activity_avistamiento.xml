@@ -1,34 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:padding="16dp">
-
-    <TextView
-        android:id="@+id/tvContador"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Avistamientos registrados: 0"
-        android:textSize="18sp"
-        android:textStyle="bold"
-        android:layout_marginBottom="12dp" />
-
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Pulsación larga sobre una fila para borrarla"
-        android:layout_marginBottom="8dp" />
-
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recyclerAvistamientos"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1" />
-
-    <Button
-        android:id="@+id/botonVolverAvistamientos"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Volver" />
+    android:layout_width="match_parent" android:layout_height="match_parent"
+    android:orientation="vertical" android:padding="18dp" android:background="@color/fondo">
+    <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:text="DIARIO DE EXPLORACIÓN" android:textColor="@color/acento"
+        android:textStyle="bold" android:textSize="12sp" android:letterSpacing="0.12" />
+    <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:layout_marginTop="5dp" android:text="Tus encuentros."
+        android:textColor="@color/texto_principal" android:textSize="28sp" android:textStyle="bold" />
+    <TextView android:id="@+id/tvContador" android:layout_width="match_parent"
+        android:layout_height="wrap_content" android:layout_marginTop="5dp"
+        android:layout_marginBottom="8dp" android:text="Avistamientos registrados: 0"
+        android:textColor="@color/texto_secundario" android:textSize="14sp" />
+    <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:text="Toca un registro con coordenadas para abrir el mapa. Mantén pulsado para eliminarlo."
+        android:layout_marginBottom="10dp" android:textColor="@color/texto_secundario" android:textSize="12sp" />
+    <androidx.recyclerview.widget.RecyclerView android:id="@+id/recyclerAvistamientos"
+        android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1" />
+    <Button android:id="@+id/botonVolverAvistamientos" android:layout_width="match_parent"
+        android:layout_height="wrap_content" android:text="Volver al bestiario" />
 </LinearLayout>
