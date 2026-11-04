@@ -116,16 +116,16 @@ class DetalleActivity : ComponentActivity() {
     private fun obtenerUbicacion() {
         servicioUbicacion.obtener(
             alObtener = { ubicacion ->
-                if (isFinishing || isDestroyed) return@obtener
-
-                if (ubicacion != null) {
-                    latitud = ubicacion.latitude
-                    longitud = ubicacion.longitude
-                    tvUbicacion.text = "Ubicación: %.4f, %.4f".format(
-                        Locale.US, ubicacion.latitude, ubicacion.longitude
-                    )
-                } else {
-                    Toast.makeText(this, "No se ha podido obtener la ubicación", Toast.LENGTH_SHORT).show()
+                if (!isFinishing && !isDestroyed) {
+                    if (ubicacion != null) {
+                        latitud = ubicacion.latitude
+                        longitud = ubicacion.longitude
+                        tvUbicacion.text = "Ubicación: %.4f, %.4f".format(
+                            Locale.US, ubicacion.latitude, ubicacion.longitude
+                        )
+                    } else {
+                        Toast.makeText(this, "No se ha podido obtener la ubicación", Toast.LENGTH_SHORT).show()
+                    }
                 }
             },
             alFallar = {
